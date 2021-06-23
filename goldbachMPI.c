@@ -27,8 +27,9 @@ char **argv;
   int sendmsg;/* Array for send */
   int recvmsg;/* Array for receive */
   int i, a;
+  int count = 0;
   char flag;
-  int n = 3;
+  int n = 10;
   MPI_Status status;
   MPI_Init( &argc, &argv );
   MPI_Comm_rank( MPI_COMM_WORLD, &myrank );
@@ -42,10 +43,12 @@ char **argv;
   rnode=(myrank+1)%size;
   lnode=(myrank-1+size)%size;
   printf("I am %d, right node=%d, left node=%d.\n",myrank, rnode,lnode);
-  while(n <= 10){ 
+  MPI_Barrier(MPI_COMM_WORLD);
+  for(i=0;i<=n;i++){ 
     // 偶数であるかの判定を行う
-
-    n++;
+    sendmsg = n * myrank + i;
+    if(sendmsg < 3) continue;
+    printf("%d\n", sendmsg);
   }
   time=MPI_Wtime()-start;
   printf("I am %d used time = %f seconds.\n" ,myrank,time);
