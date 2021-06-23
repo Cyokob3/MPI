@@ -21,37 +21,34 @@ char **argv;
 {
   int myrank;
   double start, time;
+  int size;
+  int rnode;/* right node */
+  int lnode;/* left node */
+  int sendmsg;/* Array for send */
+  int recvmsg;/* Array for receive */
   int i, a;
   char flag;
   int n = 3;
   MPI_Status status;
   MPI_Init( &argc, &argv );
   MPI_Comm_rank( MPI_COMM_WORLD, &myrank );
+  MPI_Comm_size( MPI_COMM_WORLD, &size );
   start = MPI_Wtime();
-  printf("Hello from %d node\n",myrank);
-  while(n <= 100){ 
+  if(myrank==0){
+    printf("No. of process = %d.\n",size);
+    printf("Time tick = %16.6E seconds.\n",MPI_Wtick());
+    printf("_________________________________________\n");
+  }
+  rnode=(myrank+1)%size;
+  lnode=(myrank-1+size)%size;
+  printf("I am %d, right node=%d, left node=%d.\n",myrank, rnode,lnode);
+  while(n <= 10){ 
     // 偶数であるかの判定を行う
-    flag = 0;
-    if(!(n % 2 == 0)){
-      n++;
-      continue;
-    }
-    printf("%d : ", n);
-    for (i=2; i<n; i++){
-      if(!(is_prime(i))) continue;
-      a = n - i;
-      if(!(is_prime(a))) continue;
-      flag = 1;
-    }
-    if (flag == 1) printf("ok\n");
-    else {
-      printf("error\n");
-      break;
-    }
+
     n++;
   }
   time=MPI_Wtime()-start;
-  printf("used time = %f seconds.\n" ,time);
+  printf("I am %d used time = %f seconds.\n" ,myrank,time);
   MPI_Finalize();
 }
 
